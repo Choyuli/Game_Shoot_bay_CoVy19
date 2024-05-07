@@ -27,7 +27,7 @@ Lost_screen = pg.image.load(os.path.join("assests","8.png"))
 Lost_screen = pg.transform.scale(Lost_screen, (900, 500))
 WINNER_screen = pg.image.load(os.path.join("assests","9.png"))
 WINNER_screen = pg.transform.scale(WINNER_screen, (900, 500))
-pg.display.set_caption("Game của bạn TomFT")
+pg.display.set_caption("버그 없애기")
 
 # music_in_game.set_volume = 0.6
 # class
@@ -100,7 +100,7 @@ class character:
 
 
 class player(character):
-    def __init__(self, x, y, health=100):
+    def __init__(self, x, y, health=50):
         super().__init__(x, y, health=health)
         self.Char_Img = PlayerImg
         self.Bullet_Img = BulletImg
@@ -163,7 +163,6 @@ def main():
     lost = False
     run = True
     level = 0
-    shield = 5
     enemies = []
     wave_length = 0
     Player_vel = 8
@@ -180,10 +179,10 @@ def main():
 
     def Redraw_window():
         screen.blit(Background, (0, 0))
-        lives_label = main_font.render(f"Shield: {shield}", 1, (0, 0, 255))
-        level_label = main_font.render(f"Level: {level}", 1, (255, 255, 255))
-        screen.blit(lives_label, (10, 10))
+        level_label = main_font.render(f"level: {level}", 1, (255, 255, 255))
+        hp_label = main_font.render(f"HP: {Player.health}", 1, (0, 255, 0))
         screen.blit(level_label, (WIDTH - level_label.get_width()-10, 10))
+        screen.blit(hp_label, (10,10))
         Player.draw(screen)
         for Enemy in enemies:
             Enemy.draw(screen)
@@ -191,7 +190,7 @@ def main():
             music_in_game.stop()
             screen.blit(Lost_screen, (0, 0))
             lost_label = lost_font.render(
-                "CLICK TO PLAY AGAIN", 1, (255, 255, 255))
+                "press to restart", 1, (255, 255, 255))
             screen.blit(lost_label, (WIDTH / 3, HEIGHT / 2))
         if win == True:
             music_in_game.stop()
@@ -202,7 +201,7 @@ def main():
         clock.tick(FPS)
 
         Redraw_window()
-        if shield <= 0 or Player.health <= 0:
+        if  Player.health <= 0:
             lost = True
             lost_count += 1
         if level > 10:
@@ -220,8 +219,8 @@ def main():
                 continue
         if len(enemies) == 0:
             level += 1
-            wave_length += 15
-            Enemy_vel += 0.25
+            wave_length += 10
+            Enemy_vel += 0.5
             for i in range(wave_length):
                 Enemy = enemy(random.randrange(WIDTH, WIDTH + level * 500),
                               random.randrange(75, HEIGHT - 75), random.choice(["red", "green", "blue"]))
@@ -247,13 +246,13 @@ def main():
         for Enemy in enemies[:]:
             Enemy.move(Enemy_vel)
             if Enemy.x < 0:
-                shield -= 1
+                Player.health -= 10
                 enemies.remove(Enemy)
             if collide(Enemy, Player):
                 Player.health -= 25
                 enemies.remove(Enemy)
             elif Enemy.x - Enemy.get_width() < 0:
-                shield -= 1
+                Player.health -= 10
                 enemies.remove(Enemy)
         Player.move_bullet(-15, enemies)
 
